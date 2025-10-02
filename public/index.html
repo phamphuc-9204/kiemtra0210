@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tab-container {
+            margin-bottom: 40px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .user-icon { background: linear-gradient(45deg, #4facfe, #00f2fe); }
+        .role-icon { background: linear-gradient(45deg, #43e97b, #38f9d7); }
+        .search-icon { background: linear-gradient(45deg, #fa709a, #fee140); }
+        .activate-icon { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+
+        .card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+        }
+
+        .result-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .result-area h4 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-area h4 i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .result-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .data-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .id-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .api-endpoints {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+
+        .api-endpoints h3 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .api-endpoints h3 i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .endpoint-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .endpoint-method {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-muted {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+
+        .p-3 {
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+
+            .tab-buttons {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                border-bottom: none;
+                border-right: 3px solid transparent;
+            }
+
+            .tab-button.active {
+                border-right-color: #667eea;
+                border-bottom-color: transparent;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
+
+            .data-table th:nth-child(1),
+            .data-table td:nth-child(1) {
+                display: none; /* Hide ID column on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-users"></i> User Management System</h1>
+            <p>Hệ thống quản lý người dùng và vai trò hiện đại</p>
+        </div>
+
+        <div class="tab-container">
+            <!-- Tab Buttons -->
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('user-management')">
+                    <i class="fas fa-users"></i> Quản lý User
+                </button>
+                <button class="tab-button" onclick="switchTab('role-management')">
+                    <i class="fas fa-user-tag"></i> Quản lý Role
+                </button>
+                <button class="tab-button" onclick="switchTab('user-activation')">
+                    <i class="fas fa-user-check"></i> Kích hoạt User
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <!-- User Management Tab -->
+            <div id="user-management" class="tab-content active">
+                <h2><i class="fas fa-users"></i> Quản lý User</h2>
+                <p class="mb-4">Tạo mới, tìm kiếm và xóa mềm người dùng</p>
+                
+                <div class="dashboard">
+                    <!-- Tạo User Mới -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon user-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h3>Tạo User Mới</h3>
+                                <p>Thêm người dùng mới vào hệ thống</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="newUsername" placeholder="Nhập username">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="newEmail" placeholder="Nhập email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" id="newPassword" placeholder="Nhập mật khẩu">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" id="newFullName" placeholder="Nhập tên đầy đủ">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Role ID</label>
+                            <input type="text" class="form-control" id="newRoleId" placeholder="Nhập ID của role">
+                            <small class="text-muted">Tip: Xem danh sách roles ở tab "Quản lý Role"</small>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="createUser()">
+                            <i class="fas fa-user-plus"></i> Tạo User
+                        </button>
+                    </div>
+
+                    <!-- Tìm kiếm User -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon search-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div>
+                                <h3>Tìm kiếm User</h3>
+                                <p>Tìm kiếm theo username hoặc tên đầy đủ</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tìm kiếm theo Username</label>
+                            <input type="text" class="form-control" id="searchUsername" placeholder="Nhập username để tìm kiếm">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tìm kiếm theo Full Name</label>
+                            <input type="text" class="form-control" id="searchFullName" placeholder="Nhập tên đầy đủ để tìm kiếm">
+                        </div>
+                        
+                        <button class="btn" onclick="searchUsers()">
+                            <i class="fas fa-search"></i> Tìm kiếm Users
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="getAllUsers()" style="margin-top: 10px;">
+                            <i class="fas fa-list"></i> Lấy tất cả Users
+                        </button>
+                    </div>
+
+                    <!-- Xóa mềm User -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(45deg, #dc3545, #fd7e14);">
+                                <i class="fas fa-user-times"></i>
+                            </div>
+                            <div>
+                                <h3>Xóa mềm User</h3>
+                                <p>Xóa user khỏi hệ thống (soft delete)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>User ID</label>
+                            <input type="text" class="form-control" id="deleteUserId" placeholder="Nhập ID của user cần xóa">
+                            <small class="text-muted">Tip: Lấy ID từ kết quả tìm kiếm users</small>
+                        </div>
+                        
+                        <button class="btn btn-danger" onclick="deleteUser()">
+                            <i class="fas fa-trash"></i> Xóa User
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Management Tab -->
+            <div id="role-management" class="tab-content">
+                <h2><i class="fas fa-user-tag"></i> Quản lý Role</h2>
+                <p class="mb-4">Thêm hoặc xóa vai trò trong hệ thống</p>
+                
+                <div class="dashboard">
+                    <!-- Tạo Role -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon role-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div>
+                                <h3>Tạo Role Mới</h3>
+                                <p>Thêm vai trò mới vào hệ thống</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tên Role</label>
+                            <input type="text" class="form-control" id="roleName" placeholder="Nhập tên role">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Mô tả</label>
+                            <input type="text" class="form-control" id="roleDescription" placeholder="Nhập mô tả role">
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="createRole()">
+                            <i class="fas fa-plus"></i> Tạo Role
+                        </button>
+                    </div>
+
+                    <!-- Xem danh sách Role -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(45deg, #17a2b8, #20c997);">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div>
+                                <h3>Danh sách Role</h3>
+                                <p>Xem tất cả roles trong hệ thống</p>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="getAllRoles()">
+                            <i class="fas fa-list"></i> Lấy tất cả Roles
+                        </button>
+                    </div>
+
+                    <!-- Xóa Role -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(45deg, #dc3545, #fd7e14);">
+                                <i class="fas fa-minus-circle"></i>
+                            </div>
+                            <div>
+                                <h3>Xóa Role</h3>
+                                <p>Xóa vai trò khỏi hệ thống (soft delete)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Role ID</label>
+                            <input type="text" class="form-control" id="deleteRoleId" placeholder="Nhập ID của role cần xóa">
+                            <small class="text-muted">Tip: Lấy ID từ danh sách roles</small>
+                        </div>
+                        
+                        <button class="btn btn-danger" onclick="deleteRole()">
+                            <i class="fas fa-trash"></i> Xóa Role
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Activation Tab -->
+            <div id="user-activation" class="tab-content">
+                <h2><i class="fas fa-user-check"></i> Kích hoạt User</h2>
+                <p class="mb-4">Kích hoạt tài khoản người dùng bằng email và username</p>
+                
+                <div class="dashboard">
+                    <div class="card" style="max-width: 500px; margin: 0 auto;">
+                        <div class="card-header">
+                            <div class="card-icon activate-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div>
+                                <h3>Kích hoạt User</h3>
+                                <p>Nhập email và username để kích hoạt</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="activateEmail" placeholder="Nhập email của user">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="activateUsername" placeholder="Nhập username của user">
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="activateUser()">
+                            <i class="fas fa-check-circle"></i> Kích hoạt User
+                        </button>
+
+                        <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 8px;">
+                            <h5><i class="fas fa-info-circle"></i> Hướng dẫn:</h5>
+                            <ul class="mb-0">
+                                <li>Nhập chính xác email và username của user</li>
+                                <li>Nếu thông tin đúng, status sẽ được chuyển thành <strong>true</strong></li>
+                                <li>User đã kích hoạt có thể đăng nhập vào hệ thống</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Area -->
+        <div class="result-area">
+            <h4><i class="fas fa-terminal"></i> Kết quả API</h4>
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner"></i> Đang xử lý...
+            </div>
+            <div class="result-content" id="resultContent">Chọn một chức năng để xem kết quả...</div>
+        </div>
+
+        <!-- API Endpoints Documentation -->
+        <div class="api-endpoints">
+            <h3><i class="fas fa-code"></i> API Endpoints</h3>
+            <div class="endpoint-list">
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-url">/api/users</span>
+                    <span>Lấy tất cả users (có thể tìm kiếm theo ?username=... &fullName=...)</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-url">/api/users</span>
+                    <span>Tạo user mới</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-url">/api/users/id/:id</span>
+                    <span>Lấy user theo ID</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-url">/api/users/username/:username</span>
+                    <span>Lấy user theo username</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-url">/api/users/activate</span>
+                    <span>Kích hoạt user (cần email và username)</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-url">/api/roles</span>
+                    <span>Lấy tất cả roles</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-url">/api/roles</span>
+                    <span>Tạo role mới</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContent').textContent = '';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function displayResult(data, isError = false) {
+            hideLoading();
+            const resultContent = document.getElementById('resultContent');
+            
+            if (isError) {
+                resultContent.innerHTML = `<div style="color: #721c24; background: #f8d7da; padding: 15px; border-radius: 8px;">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Lỗi:</strong> ${data.error || data.message || 'Có lỗi xảy ra'}
+                </div>`;
+                return;
+            }
+
+            // Kiểm tra nếu data là array (danh sách users/roles)
+            if (Array.isArray(data)) {
+                if (data.length === 0) {
+                    resultContent.innerHTML = '<div class="no-data"><i class="fas fa-inbox"></i> Không có dữ liệu</div>';
+                    return;
+                }
+
+                // Kiểm tra xem có phải là danh sách users không
+                if (data[0] && data[0].username !== undefined) {
+                    displayUserTable(data);
+                } else if (data[0] && data[0].name !== undefined) {
+                    displayRoleTable(data);
+                } else {
+                    // Fallback to JSON
+                    resultContent.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } else if (data && typeof data === 'object') {
+                // Single object result
+                if (data.user && data.user.username) {
+                    displayUserTable([data.user]);
+                } else if (data.role && data.role.name) {
+                    displayRoleTable([data.role]);
+                } else {
+                    // Success message or other data
+                    resultContent.innerHTML = `<div style="color: #155724; background: #d4edda; padding: 15px; border-radius: 8px;">
+                        <i class="fas fa-check-circle"></i> <strong>Thành công:</strong> ${data.message || JSON.stringify(data, null, 2)}
+                    </div>`;
+                }
+            } else {
+                resultContent.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+        }
+
+        function displayUserTable(users) {
+            const resultContent = document.getElementById('resultContent');
+            
+            let tableHtml = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Login Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                const statusBadge = user.status 
+                    ? '<span class="status-badge status-active">Active</span>'
+                    : '<span class="status-badge status-inactive">Inactive</span>';
+                
+                const roleName = user.role ? (user.role.name || user.role) : 'N/A';
+                
+                tableHtml += `
+                    <tr>
+                        <td class="id-cell">${user._id || user.id}</td>
+                        <td><strong>${user.username}</strong></td>
+                        <td>${user.fullName || ''}</td>
+                        <td>${user.email}</td>
+                        <td><span class="role-badge">${roleName}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>${user.loginCount || 0}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px; color: #6c757d; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Tổng cộng: ${users.length} user(s)
+                </div>
+            `;
+
+            resultContent.innerHTML = tableHtml;
+        }
+
+        function displayRoleTable(roles) {
+            const resultContent = document.getElementById('resultContent');
+            
+            let tableHtml = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Role</th>
+                            <th>Mô tả</th>
+                            <th>Ngày tạo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            roles.forEach(role => {
+                const createdAt = role.createdAt ? new Date(role.createdAt).toLocaleDateString('vi-VN') : 'N/A';
+                
+                tableHtml += `
+                    <tr>
+                        <td class="id-cell">${role._id || role.id}</td>
+                        <td><strong>${role.name}</strong></td>
+                        <td>${role.description || ''}</td>
+                        <td>${createdAt}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px; color: #6c757d; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Tổng cộng: ${roles.length} role(s)
+                </div>
+            `;
+
+            resultContent.innerHTML = tableHtml;
+        }
+
+        async function makeRequest(url, options = {}) {
+            showLoading();
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                const data = await response.json();
+                displayResult(data, !response.ok);
+                return data;
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // User functions
+        async function getAllUsers() {
+            await makeRequest(`${API_BASE}/users`);
+        }
+
+        async function searchUsers() {
+            const username = document.getElementById('searchUsername').value;
+            const fullName = document.getElementById('searchFullName').value;
+            
+            let url = `${API_BASE}/users`;
+            const params = new URLSearchParams();
+            
+            if (username) params.append('username', username);
+            if (fullName) params.append('fullName', fullName);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            await makeRequest(url);
+        }
+
+        async function createUser() {
+            const userData = {
+                username: document.getElementById('newUsername').value,
+                email: document.getElementById('newEmail').value,
+                password: document.getElementById('newPassword').value,
+                fullName: document.getElementById('newFullName').value,
+                role: document.getElementById('newRoleId').value
+            };
+
+            if (!userData.username || !userData.email || !userData.password || !userData.role) {
+                displayResult({ error: 'Vui lòng điền đầy đủ thông tin bắt buộc' }, true);
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/users`, {
+                method: 'POST',
+                body: JSON.stringify(userData)
+            });
+        }
+
+        async function activateUser() {
+            const email = document.getElementById('activateEmail').value;
+            const username = document.getElementById('activateUsername').value;
+
+            if (!email || !username) {
+                displayResult({ error: 'Vui lòng nhập email và username' }, true);
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/users/activate`, {
+                method: 'POST',
+                body: JSON.stringify({ email, username })
+            });
+        }
+
+        // Role functions
+        async function getAllRoles() {
+            await makeRequest(`${API_BASE}/roles`);
+        }
+
+        async function createRole() {
+            const name = document.getElementById('roleName').value;
+            const description = document.getElementById('roleDescription').value;
+
+            if (!name) {
+                displayResult({ error: 'Vui lòng nhập tên role' }, true);
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/roles`, {
+                method: 'POST',
+                body: JSON.stringify({ name, description })
+            });
+        }
+
+        // Tab switching function
+        function switchTab(tabId) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Add active class to selected tab and button
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            // Clear result area when switching tabs
+            displayResult({ message: `Đã chuyển sang tab: ${event.target.textContent.trim()}` });
+        }
+
+        // Delete user function
+        async function deleteUser() {
+            const userId = document.getElementById('deleteUserId').value;
+
+            if (!userId) {
+                displayResult({ error: 'Vui lòng nhập User ID' }, true);
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/users/${userId}`, {
+                method: 'DELETE'
+            });
+        }
+
+        // Delete role function
+        async function deleteRole() {
+            const roleId = document.getElementById('deleteRoleId').value;
+
+            if (!roleId) {
+                displayResult({ error: 'Vui lòng nhập Role ID' }, true);
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/roles/${roleId}`, {
+                method: 'DELETE'
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            displayResult({ message: 'Chào mừng đến với User Management System! Chọn một tab để bắt đầu.' });
+        });
+    </script>
+</body>
+</html>
